@@ -16,14 +16,20 @@ credential artifacts were staged. Ignore checks passed for
 environment files, virtual environment, databases/SQLite sidecars, private
 keys/credential directories, caches, and model files.
 
-The existing origin is alishapandit228/arogya-caller, currently PUBLIC according
-to GitHub repository-page metadata and its Public badge. No duplicate repository
-was created. Git reads work through the existing authenticated connection.
-GitHub API requests are blocked by the cloud network policy (CONNECT HTTP 403),
-so neither repository visibility changes nor account/API administration are
-available here. The configuration draft also could not be read/verified.
-A push is blocked until private visibility is established; public publishing
-is not authorized. A local reviewed commit may be prepared independently.
+The existing origin is alishapandit228/arogya-caller. The user confirmed it
+was changed to Private and verified its visibility. The cloud's anonymous
+repository-page request now returns HTTP 404 while authenticated Git fetch
+succeeds, consistent with that confirmation. GitHub API administration remains
+blocked by the cloud policy; no policy bypass or duplicate repository was used.
+
+The reviewed backend commit is 055b2ee2863de5922e36dffba13ea3d08f901964.
+Before pushing, remote main was fetched and verified to be its direct ancestor
+(the original commit 0ecb48ea561174e4067bb064f2829bf4bfe8c120);
+there were no unrelated remote changes or conflicts. The local worktree was
+clean. This documentation update records the removed visibility blocker.
+Publishing uses a normal fast-forward push to main, without force or history
+rewriting. The same 50 mocked tests and security checks were rerun before
+publishing; real AI backend validation remains pending on the MacBook.
 
 Remaining risks are unchanged: real AI backend validation is pending on the
 MacBook; small-model errors/prompt influence, single-admin access, local

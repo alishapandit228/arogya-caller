@@ -1,5 +1,12 @@
 # Arogya Caller
 
+**Current work: Phase 2 browser voice calling.** See
+[Phase 2 setup](docs/PHASE2_SETUP.md) for the Mac + mobile HTTPS workflow and
+[Phase 2 engineering/security report](docs/PHASE2_REPORT.md) for verified results.
+The Phase 1 text backend remains available. Real local speech/Ollama/device
+validation is still pending on the Mac; cloud browser tests use explicit mocks.
+
+
 A free, locally runnable, role-based AI information collection backend. Phase 1
 implements text conversations to validate the logic for a future browser voice
 calling product. It does not make calls or book appointments.
@@ -173,11 +180,11 @@ text and do not implement timezone or scheduling semantics. Appointment requests
 are records, not bookings or clinical guidance. Do not collect real patient data
 for this hackathon demonstration.
 
-## Planned phases (not implemented)
+## Phase history and next scope
 
-Phase 2: browser internet calling, speech recognition, text-to-speech, and React.
-Phase 3: application integration and product hardening; exact scope to be agreed.
-No Phase 2/3 code has been started.
+Phase 2 now adds the browser calling workflow, offline speech adapters, and React
+interfaces; consult the Phase 2 report for test boundaries and local validation.
+Phase 3 application integration and product hardening remain planned and unimplemented.
 
 ## Git review
 

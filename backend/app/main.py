@@ -1,4 +1,5 @@
 import secrets
+import re
 import threading
 from collections import OrderedDict
 from contextlib import asynccontextmanager
@@ -20,7 +21,7 @@ from app.services.engine import advance, transition
 from app.services.ollama import ModelError, Ollama
 
 
-def create_app(settings=None, model=None):
+def create_app(settings=None, model=None, speech=None):
     settings = settings or Settings()
     engine = create_engine(settings.database_url, connect_args={"check_same_thread": False, "timeout": 10})
     factory = sessionmaker(engine, expire_on_commit=False)
@@ -31,6 +32,7 @@ def create_app(settings=None, model=None):
     @asynccontextmanager
     async def lifespan(app):
         Base.metadata.create_all(engine)
+        app.state.voice.recover()
         yield
         histories.clear()
         engine.dispose()
@@ -45,7 +47,7 @@ def create_app(settings=None, model=None):
         chunks = []
         async for chunk in request.stream():
             size += len(chunk)
-            if size > 8192:
+            if size > (2_000_000 if request.url.path.startswith("/voice/calls/") and request.url.path.endswith("/audio") else 8192):
                 return JSONResponse({"error": "Request body too large"}, status_code=413)
             chunks.append(chunk)
         request._body = b"".join(chunks)
@@ -148,6 +150,9 @@ def create_app(settings=None, model=None):
 
     @app.post("/sessions/{session_id}/reply", dependencies=[Depends(auth)])
     def reply(session_id: UUID, payload: Reply, session=Depends(db)):
+        return handle_reply(session_id, payload, session)
+
+    def handle_reply(session_id, payload, session, commit_hook=None):
         if not lock.acquire(blocking=False):
             raise HTTPException(429, "Conversation engine busy")
         try:
@@ -166,9 +171,12 @@ def create_app(settings=None, model=None):
             try:
                 turn = model.turn(context, histories.get(item.id, []), payload.message)
                 # Model intent alone cannot authorize consent or final confirmation.
-                explicit = payload.message.strip().lower().rstrip(".!")
-                accepted = {"yes", "yes, i consent", "i consent", "i agree",
-                            "yes, these details are correct", "confirm", "confirmed"}
+                explicit = " ".join(re.sub(r"[^a-z ]", " ", payload.message.lower()).split())
+                accepted = set()
+                if turn.intent == "consent" and item.status == "awaiting_consent":
+                    accepted = {"yes", "yes i consent", "i consent", "i agree"}
+                elif turn.intent == "confirm" and item.confirming:
+                    accepted = {"yes", "yes these details are correct", "confirm", "confirmed"}
                 if turn.intent in {"consent", "confirm"} and explicit not in accepted:
                     turn.intent = "unclear"
                     turn.fields = {}
@@ -188,9 +196,15 @@ def create_app(settings=None, model=None):
                 histories[item.id] = history[-8:]
                 while len(histories) > 100:
                     histories.popitem(last=False)
-            session.commit()
+            if commit_hook is None:
+                session.commit()
+            else:
+                commit_hook(session, item)
             return view(item, message)
         finally:
             lock.release()
 
+    from app.voice.routes import mount_voice
+    mount_voice(app, settings, factory, create, handle_reply, cancel, listing, get,
+                result, roles, speech)
     return app

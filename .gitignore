@@ -31,3 +31,13 @@ credentials/
 .mypy_cache/
 .ruff_cache/
 .DS_Store
+node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+.models/
+.certs/
+*.aiff
+*.wav
+*.webm
+*.mp4

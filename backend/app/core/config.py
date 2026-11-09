@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./arogya.db"
     ollama_url: str = "http://127.0.0.1:11434"
     ollama_model: str = "qwen2.5:1.5b"
+    voice_cookie_secure: bool = True
+    whisper_model_path: str = ".models/faster-whisper-tiny.en"
     trusted_origins: list[str] = Field(default_factory=list)
 
     @field_validator("admin_api_token")
@@ -40,6 +42,8 @@ class Settings(BaseSettings):
     def explicit_origins(cls, values):
         for value in values:
             url = urlparse(value)
+            if url.scheme == "http" and url.hostname not in {"localhost", "127.0.0.1", "::1"}:
+                raise ValueError("LAN browser origins require HTTPS")
             if "*" in value or url.scheme not in {"http", "https"} or not url.netloc or url.path or url.query or url.fragment or url.username:
                 raise ValueError("Use explicit HTTP origins without paths or wildcards")
         return values

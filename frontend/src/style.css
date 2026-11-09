@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@layer base {
+  body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+  h2 { @apply text-lg font-semibold mb-3; }
+  label { @apply block text-sm text-slate-300 mb-4; }
+  input, select { @apply block w-full mt-2 p-3 rounded-lg bg-slate-950 border border-slate-700 text-slate-100; }
+  input:focus, select:focus, button:focus-visible, a:focus-visible { @apply outline-2 outline-offset-2 outline-teal-300; }
+  button { @apply rounded-lg bg-teal-300 text-slate-950 px-4 py-3 font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed; }
+  th, td { @apply p-3 border-b border-slate-800 text-sm; }
+}
+@layer components {
+  .panel { @apply rounded-2xl border border-slate-800 bg-slate-900 p-6; }
+  .eyebrow { @apply text-xs tracking-widest font-semibold text-teal-300 mb-3; }
+  .muted { @apply text-sm text-slate-400 leading-relaxed; }
+  .secondary { @apply bg-slate-800 text-slate-100 border border-slate-600; }
+  .danger { @apply bg-red-950 border border-red-700 text-red-200; }
+}

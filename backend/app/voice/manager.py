@@ -193,17 +193,17 @@ class Voice:
             if call.status in TERMINAL:
                 self.cleanup_session(call)
             raise
-        except SpeechError:
+        except SpeechError as exc:
             if call.status != 'completed':
                 self.stop(call, 'failed')
-            raise HTTPException(503, 'Offline speech processing failed') from None
+            raise HTTPException(503, exc.public_message or 'Offline speech processing failed') from None
 
     def work(self, operation):
         if not self.resource.acquire(blocking=False):
             raise HTTPException(429, 'Voice processor busy; retry after the current turn')
         try:
             return operation()
-        except SpeechError:
-            raise HTTPException(503, 'Offline speech processing failed; check local models') from None
+        except SpeechError as exc:
+            raise HTTPException(503, exc.public_message or 'Offline speech processing failed; check local models') from None
         finally:
             self.resource.release()

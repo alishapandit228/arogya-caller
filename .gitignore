@@ -41,3 +41,15 @@ frontend/playwright-report/
 *.wav
 *.webm
 *.mp4
+# Cross-platform installers, certificates and database backups
+*.exe
+*.dll
+*.dylib
+*.so
+*.crt
+*.cer
+*.der
+*.p7b
+*.p7c
+*.db.*
+*.onnx.json

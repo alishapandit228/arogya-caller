@@ -50,6 +50,12 @@ def voice(tmp_path):
     settings = Settings(admin_api_token='voice-test-' + 'x' * 40,
                         database_url=f"sqlite:///{tmp_path / 'voice.db'}",
                         trusted_origins=[ORIGIN], _env_file=None)
+    # Empty local files are used ONLY by worker-mocked decoder tests.
+    weights = tmp_path / 'stub-weights'
+    weights.mkdir()
+    for name in ['model.bin', 'config.json', 'tokenizer.json']:
+        (weights / name).touch()
+    settings.whisper_model_path = str(weights)
     app = create_app(settings, model, speech)
     with TestClient(app, base_url=ORIGIN) as client:
         client.headers['Origin'] = ORIGIN
@@ -509,3 +515,15 @@ def test_ai_elapsed_budget_rejects_slow_partial_response(monkeypatch):
     monkeypatch.setattr(module.httpx, 'Client', lambda **kwargs: original(transport=httpx.MockTransport(handler)))
     with pytest.raises(ModelError):
         Ollama(Settings(admin_api_token='x' * 40, _env_file=None)).turn({}, [], 'Hello')
+
+
+def test_second_simultaneous_call_is_rejected(voice):
+    client, _, _, _, settings = voice
+    identity = enroll(client, settings)
+    with client.websocket_connect('wss://testserver/voice/ws/receiver', headers={'Origin': ORIGIN}) as socket:
+        socket.receive_json()
+        first = start(client, identity)
+        response = client.post('/voice/admin/calls', json={'recipient_id': identity, 'role_id':'general'})
+        assert response.status_code == 409
+        assert action(client, first, 'reject').status_code == 200
+        assert start(client, identity) != first

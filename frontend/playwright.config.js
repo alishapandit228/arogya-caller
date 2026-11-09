@@ -22,7 +22,7 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: '../.venv/bin/python -m uvicorn browser_server:create --factory --app-dir ../backend/tests --host 127.0.0.1 --port 8000 --no-access-log --ws-max-size 2048',
+      command: 'node ./scripts/start-test-backend.mjs',
       url: 'http://127.0.0.1:8000/health',
       env: {
         PYTHONPATH: path.join(root, 'backend'),

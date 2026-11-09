@@ -1,11 +1,16 @@
 # Arogya Caller
 
-**Current work: Phase 2 browser voice calling.** See
-[Phase 2 setup](docs/PHASE2_SETUP.md) for the Mac + mobile HTTPS workflow and
-[Phase 2 engineering/security report](docs/PHASE2_REPORT.md) for verified results.
-The Phase 1 text backend remains available. Real local speech/Ollama/device
-validation is still pending on the Mac; cloud browser tests use explicit mocks.
+**Current work: Phase 3 cross-platform integration.** One shared application
+targets Windows 10/11 x64 (16 GB) and macOS (8 GB). Start with
+[Windows PowerShell setup](docs/WINDOWS_SETUP.md) or
+[macOS zsh setup](docs/MACOS_SETUP.md), then read the
+[Phase 3 engineering/security report](docs/PHASE3_REPORT.md).
+Windows uses offline Piper; Mac uses installed say or optional Piper.
+Both default to local qwen2.5:3b, with explicit profile/model overrides and
+no automatic downloads during calls. Real hardware validation remains pending.
 
+The Phase 1 and Phase 2 sections/reports below are preserved as history;
+the OS-specific Phase 3 guides are the current startup instructions.
 
 A free, locally runnable, role-based AI information collection backend. Phase 1
 implements text conversations to validate the logic for a future browser voice
@@ -184,7 +189,9 @@ for this hackathon demonstration.
 
 Phase 2 now adds the browser calling workflow, offline speech adapters, and React
 interfaces; consult the Phase 2 report for test boundaries and local validation.
-Phase 3 application integration and product hardening remain planned and unimplemented.
+Phase 3 adds the current cross-platform profiles, offline Piper adapter,
+portable validation tooling, and OS-specific setup guides. Real-device
+acceptance remains pending as recorded in the Phase 3 report.
 
 ## Git review
 

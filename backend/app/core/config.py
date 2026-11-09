@@ -1,5 +1,7 @@
+from typing import Literal
 from urllib.parse import urlparse
-from pydantic import Field, SecretStr, field_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
+from app.core.profiles import PROFILES, profile_name
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -8,10 +10,21 @@ class Settings(BaseSettings):
     admin_api_token: SecretStr
     database_url: str = "sqlite:///./arogya.db"
     ollama_url: str = "http://127.0.0.1:11434"
-    ollama_model: str = "qwen2.5:1.5b"
+    ai_profile: Literal["auto", "windows16", "macos8", "portable"] = "auto"
+    ollama_model: str | None = Field(default=None, min_length=1, max_length=100, pattern=r"^[A-Za-z0-9_.:/-]+$")
+    tts_engine: Literal["auto", "say", "piper", "espeak"] = "auto"
+    tts_voice: str | None = Field(default=None, max_length=100)
+    piper_model_path: str = ".models/piper/en_US-lessac-low.onnx"
+    piper_config_path: str | None = None
     voice_cookie_secure: bool = True
     whisper_model_path: str = ".models/faster-whisper-tiny.en"
     trusted_origins: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def select_profile(self):
+        if self.ollama_model is None:
+            self.ollama_model = PROFILES[profile_name(self.ai_profile)][0]
+        return self
 
     @field_validator("admin_api_token")
     @classmethod

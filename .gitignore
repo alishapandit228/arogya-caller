@@ -1,0 +1,33 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.db
+*.db-*
+*.sqlite*
+*.log
+/models/
+.ollama/
+.coverage
+# Local secrets, credentials, and private keys
+secrets/
+credentials/
+*.pem
+*.key
+*.p12
+*.pfx
+# Local models and development caches
+*.gguf
+*.ggml
+*.safetensors
+*.onnx
+*.pt
+*.pth
+*.bin
+.cache/
+.mypy_cache/
+.ruff_cache/
+.DS_Store
